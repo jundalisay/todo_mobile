@@ -117,7 +117,7 @@ class EditFormState extends State<EditForm> {
   void postHttp() async {
     print('content: $contentController.text');
 
-    Response response = await Dio().put("http://192.168.100.145:4000/api/tasks/$widget.id", data: {       
+    Response response = await Dio().put("https://farm.gigalixirapp.com/api/tasks/$widget.id", data: {       
       "task": {
         "content": contentController?.text,
         "position": positionController?.text,

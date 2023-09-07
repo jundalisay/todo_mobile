@@ -26,7 +26,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Future<void> registerUsers() async {
 
     try {
-      final response = await dio.post('http://192.168.100.145:4000/api/accounts/create',
+      final response = await dio.post('https://farm.gigalixirapp.com/api/accounts/create',
         data: {
           'account': {
             'email': usernameController?.text,
@@ -38,7 +38,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           },
         },
       );
-      // final response = await dio.post('http://192.168.100.145:4000/api/', data: {
+      // final response = await dio.post('https://farm.gigalixirapp.com/api/', data: {
       //   'user[username]': usernameController?.text,
       //   'user[password]': passwordController?.text,
       //   'user[password_confirmation]': passwordController?.text
@@ -65,7 +65,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   //   debugPrint('username is...');
   //   debugPrint(usernameController?.text);    
   //   try {
-  //     response = await dio.post('http://192.168.100.145:4000/api/registration', data: {
+  //     response = await dio.post('https://farm.gigalixirapp.com/api/registration', data: {
   //       'user[username]': usernameController?.text,
   //       'user[password]': passwordController?.text,
   //       'user[password_confirmation]': passwordController?.text

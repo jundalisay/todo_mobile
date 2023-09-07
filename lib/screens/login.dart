@@ -25,7 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       final response = await dio.post(
-        'http://192.168.100.145:4000/api/accounts/sign_in',
+        'https://farm.gigalixirapp.com/api/accounts/sign_in',
         data: {
           // 'account': {
             'email': usernameController?.text,
@@ -54,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
   //   debugPrint('-------------------');
   //   debugPrint(usernameController?.text);     
   //   try {
-  //     response = await dio.post('http://192.168.100.145:4000/api/login', data: {
+  //     response = await dio.post('https://farm.gigalixirapp.com/api/login', data: {
   //       'user[username]': usernameController?.text,
   //       'user[password]': passwordController?.text,
   //     });

@@ -31,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<List<Map<String?, dynamic>>?> fetchData() async {
     try {
-      final response = await dio.get('http://192.168.100.145:4000/api/tasks?account_id=$accountId'); // Replace with your API URL
+      final response = await dio.get('https://farm.gigalixirapp.com/api/tasks?account_id=$accountId'); // Replace with your API URL
       if (response.statusCode == 200) {
         final List<dynamic> dataList = response.data['data'];
         final result = List<Map<String, dynamic>>.from(dataList);
@@ -56,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
     };
     print(data);
     try {
-      final response = await dio.put('http://192.168.100.145:4000/api/tasks/$taskId/updatepos', data: data);
+      final response = await dio.put('https://farm.gigalixirapp.com/api/tasks/$taskId/updatepos', data: data);
       print('response: ${response.data}');
       if (response.statusCode == 200) {
         print('Task position updated successfully.');
@@ -74,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
     };
     print('--------------------------data: $data');
     try {
-      final response = await dio.delete('http://192.168.100.145:4000/api/tasks/$taskId', data: data);
+      final response = await dio.delete('https://farm.gigalixirapp.com/api/tasks/$taskId', data: data);
       print('response: ${response.data}');
       if (response.statusCode == 200) {
         print('Task deleted successfully.');

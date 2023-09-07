@@ -114,7 +114,7 @@ class EntryFormState extends State<EntryForm> {
   void postHttp() async {
     print('content: $contentController.text');
 
-    Response response = await Dio().post("http://192.168.100.145:4000/api/tasks", data: {       
+    Response response = await Dio().post("https://farm.gigalixirapp.com/api/tasks", data: {       
       "task": {
         "content": contentController?.text,
         "position": positionController?.text,
