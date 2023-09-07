@@ -1,13 +1,13 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:todomob/screens/login_screen.dart';
+import 'package:todomob/screens/login.dart';
 import 'package:todomob/screens/home.dart';
 import 'package:dio/dio.dart';
 
 
 
 class RegisterScreen extends StatefulWidget {
-  static String id = "register_screen";
+
   const RegisterScreen({Key? key}) : super(key: key);
 
   @override
@@ -22,21 +22,38 @@ class _RegisterScreenState extends State<RegisterScreen> {
   
   final dio = Dio();
 
+
   Future<void> registerUsers() async {
+
     try {
-      final response = await dio.post('http://192.168.100.145:4000/api/registration', data: {
-        'user[username]': usernameController?.text,
-        'user[password]': passwordController?.text,
-        'user[password_confirmation]': passwordController?.text
-      });
+      final response = await dio.post('http://192.168.100.145:4000/api/accounts/create',
+        data: {
+          'account': {
+            'email': usernameController?.text,
+            'hash_password': passwordController?.text,
+            'full_name': usernameController?.text,
+            // 'username': usernameController?.text,
+            // 'password': passwordController?.text,
+            // 'password_confirmation': passwordController?.text,
+          },
+        },
+      );
+      // final response = await dio.post('http://192.168.100.145:4000/api/', data: {
+      //   'user[username]': usernameController?.text,
+      //   'user[password]': passwordController?.text,
+      //   'user[password_confirmation]': passwordController?.text
+      // });
+
 
       if (response.statusCode == 200) {
         final data = response.data;
-        final accessToken = data['access_token'];
-        final renewalToken = data['renewal_token'];
-        Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen(accessToken: accessToken)));
-        print('Access Token: $accessToken');
-        print('Renewal Token: $renewalToken');
+        // final accessToken = data['token'];
+        final id = data['id'];
+        print('ID: $id');
+        // Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen(accessToken: accessToken)));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen(id: id)));
+        // print('Access Token: $accessToken');
+        
       } else {
         print('Error: ${response.statusCode} - ${response.statusMessage}');
       }
@@ -145,12 +162,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       child: ElevatedButton(
                         onPressed: registerUsers,
                         style: ElevatedButton.styleFrom(
-                            primary: Colors.indigo,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10)),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 40, vertical: 15)),
-                        child: const Text(
+                          primary: Colors.indigo,
+                          shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                          padding: const EdgeInsets.symmetric(
+                          horizontal: 40, vertical: 15)
+                        ),
+                        child: Text(
                           "Register",
                           style: TextStyle(
                             fontSize: 20,
@@ -159,16 +177,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
                     ),
-
                     SizedBox(
                       width: double.infinity,
                       child: TextButton(
-                          onPressed: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const LoginScreen())),
-                          child: const Text('Login')),
-                    )
+                        onPressed: () => Navigator.push(context, MaterialPageRoute( builder: (context) => const LoginScreen())),
+                        child: Text('Login')
+                       ),
+                    ),
                   ],
                 ),
               ),
@@ -179,3 +194,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 }
+
+
+ 

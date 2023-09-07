@@ -1,52 +1,53 @@
 import 'package:flutter/material.dart';
-import 'package:todomob/screens/login_screen.dart';
-import 'dart:convert';
 import 'package:dio/dio.dart';
-
+import 'package:todomob/screens/register.dart';
+import 'package:todomob/screens/entryform.dart';
+import 'package:todomob/screens/editform.dart';
 
 
 class HomeScreen extends StatefulWidget {
-  final String accessToken;  
-  HomeScreen({required this.accessToken, Key? key}) : super(key: key);
+
+  HomeScreen({required this.id});
+  final String id;
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-
 class _HomeScreenState extends State<HomeScreen> {
-  
-  final Dio dio = Dio();
-  List<Map<String, dynamic>> tasks = [];
+
+  List<Map<String, dynamic>> data = [];
+  late String accountId;
 
   @override
   void initState() {
     super.initState();
-    fetchTasks();
+    accountId = widget.id;
+    fetchData();
   }
 
-  
+  final Dio dio = Dio();
 
-  Future<void> fetchTasks() async {
+
+  Future<List<Map<String?, dynamic>>?> fetchData() async {
     try {
-      final response = await dio.get('http://192.168.100.145:4000/api/tasks');
-      print(widget.accessToken);
-
+      final response = await dio.get('http://192.168.100.145:4000/api/tasks?account_id=$accountId'); // Replace with your API URL
       if (response.statusCode == 200) {
-        final responseData = response.data;
+        final List<dynamic> dataList = response.data['data'];
+        final result = List<Map<String, dynamic>>.from(dataList);
         setState(() {
-          tasks = List<Map<String, dynamic>>.from(responseData['data']);
+          data = result;
         });
       } else {
-        setState(() {
-          Map<String, dynamic> tasks = {};
-        });        
-        print('Error: ${response.statusCode} - ${response.statusMessage}');
+        throw Exception('Failed to load data');
       }
     } catch (e) {
-      print('Error: $e');
+      throw Exception('Error: $e');
+      return [];
     }
   }
+
+
 
   Future<void> updateTaskPosition(int taskId, int newPosition) async {
     final data = {
@@ -55,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
     };
     print(data);
     try {
-      final response = await dio.put('http://192.168.100.145:4000/api/$taskId/updatepos', data: data);
+      final response = await dio.put('http://192.168.100.145:4000/api/tasks/$taskId/updatepos', data: data);
       print('response: ${response.data}');
       if (response.statusCode == 200) {
         print('Task position updated successfully.');
@@ -67,34 +68,78 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> deleteTask(String taskId) async {
+    final data = {
+      'id': taskId
+    };
+    print('--------------------------data: $data');
+    try {
+      final response = await dio.delete('http://192.168.100.145:4000/api/tasks/$taskId', data: data);
+      print('response: ${response.data}');
+      if (response.statusCode == 200) {
+        print('Task deleted successfully.');
+      } else {
+        print('Error deleting task: ${response.statusCode} - ${response.statusMessage}');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
 
+  
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Task List'),
+        title: Text('Todo'),
       ),
-      body: ReorderableListView(
-        onReorder: (oldIndex, newIndex) {
+      body: ReorderableListView.builder(
+        itemCount: data.length,
+        itemBuilder: (BuildContext context, int index) {
+          final task = data[index];
+          return ListTile(
+            key: Key('$index'), // Provide a unique key for each item
+            leading: CircleAvatar(
+              backgroundColor: Colors.blue,
+              child: Text(task['position'].toString()),
+            ),
+            title: Text(task['content']), // Display the task content
+            trailing: GestureDetector(
+              child: Icon(Icons.delete),
+              onTap: () async {
+                deleteTask(task['id']);
+                fetchData();
+              },
+            ),
+            onTap: () async {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => EditForm(id: task['id'])));
+            },            
+          );
+        },
+        onReorder: (int oldIndex, int newIndex) {
           setState(() {
-            if (newIndex > oldIndex) {
-              newIndex -= 1;
+            if(newIndex > oldIndex){
+              newIndex -=1;
             }
-            final task = tasks.removeAt(oldIndex);
-            tasks.insert(newIndex, task);
-
-            // Update the task's position in the API
-            updateTaskPosition(task['id'], newIndex);
+            final task = data[oldIndex];
+            final taskId = task['id']; // Assuming 'id' is the key for the task ID
+            final newPosition = newIndex;
+            updateTaskPosition(taskId, newPosition); // Pass taskId and newPosition to the method=            
+            final tmp = data[oldIndex];
+            data.removeAt(oldIndex);
+            data.insert(newIndex, tmp);
           });
         },
-        children: tasks.map((task) {
-          return ListTile(
-            key: Key(task['id'].toString()),
-            title: Text(task['content']),
-          );
-        }).toList(),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => EntryForm(id: accountId)));
+        },
+        child: Icon(Icons.add) // You can use any icon you like
       ),
     );
   }
 }
+

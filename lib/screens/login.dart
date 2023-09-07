@@ -25,22 +25,22 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       final response = await dio.post(
-        'http://192.168.100.145:4000/api/session',
+        'http://192.168.100.145:4000/api/accounts/sign_in',
         data: {
-          'user': {
-            'username': usernameController?.text,
-            'password': passwordController?.text,
-          },
+          // 'account': {
+            'email': usernameController?.text,
+            'hash_password': passwordController?.text,
         },
       );
 
       if (response.statusCode == 200) {
         final data = response.data;
-        final accessToken = data['access_token'];
-        final renewalToken = data['renewal_token'];
-        Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen(accessToken: accessToken)));
-        print('Access Token: $accessToken');
-        print('Renewal Token: $renewalToken');
+        final id = data['id'];
+        print('----------------------------------------ID: $id');        
+        // Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen(accessToken: accessToken)));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen(id: id)));        
+        // print('Access Token: $accessToken');
+        // print('Renewal Token: $renewalToken');
       } else {
         print('Error: ${response.statusCode} - ${response.statusMessage}');
       }
